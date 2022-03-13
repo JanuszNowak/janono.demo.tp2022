@@ -1,52 +1,59 @@
+using System;
+using System.ComponentModel;
+using System.Net;
+using System.Reflection;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
+using Microsoft.Extensions.Logging;
+
 namespace MIMUW.FunctionApp
 {
-    using System;
-    using System.Threading.Tasks;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.Azure.WebJobs;
-    using Microsoft.Azure.WebJobs.Extensions.Http;
-    using Microsoft.AspNetCore.Http;
-    using Microsoft.Extensions.Logging;
-    using System.ComponentModel.DataAnnotations;
-    using System.ComponentModel;
-    using System.Reflection;
-
-    public static class IsAlive
+    public class IsAlive
     {
         public static readonly string ApplicationVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
-        [FunctionName("IsAlive")]
-        public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
-            ILogger log)
+        private readonly ILogger<IsAlive> _logger;
+
+        public IsAlive(ILogger<IsAlive> log)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
+            _logger = log;
+        }
+
+        [FunctionName("IsAlive")]
+        [OpenApiOperation(operationId: "Run", tags: new[] { "name" })]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "text/plain", bodyType: typeof(IsAliveContract), Description = "The OK response")]
+        public Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req)
+        {
+            _logger.LogInformation("C# HTTP trigger function processed a request.");
             var result = new IsAliveContract
             {
                 isAlive = true,
                 timestamp = DateTimeOffset.UtcNow,
                 version = ApplicationVersion,
                 regionName = Environment.GetEnvironmentVariable("REGION_NAME")
-            }; ;
-            return new OkObjectResult(result);
+            };
+            return Task.FromResult<IActionResult>(new OkObjectResult(result));
         }
     }
-
-
 
     [Description("Is Alive Contract")]
     public class IsAliveContract
     {
-        [Display(Description = "Version of Application")]
+        [System.ComponentModel.DataAnnotations.Display(Description = "Version of Application")]
         public string version { get; set; }
 
-        [Display(Description = "TimeStamp")]
+        [System.ComponentModel.DataAnnotations.Display(Description = "TimeStamp")]
         public DateTimeOffset timestamp { get; set; }
 
-        [Display(Description = "Is Alive Value")]
+        [System.ComponentModel.DataAnnotations.Display(Description = "Is Alive Value")]
         public bool isAlive { get; set; }
 
-        [Display(Description = "Region name")]
+        [System.ComponentModel.DataAnnotations.Display(Description = "Region name")]
         public string regionName { get; set; }
     }
 }
+

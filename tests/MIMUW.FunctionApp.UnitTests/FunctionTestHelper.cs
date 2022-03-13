@@ -1,13 +1,13 @@
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Internal;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Extensions.Primitives;
-using Moq;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Internal;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Extensions.Primitives;
+using Moq;
 
 namespace MIMUW.FunctionApp.UnitTests
 {

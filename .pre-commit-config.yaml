@@ -39,3 +39,8 @@ repos:
   hooks:
   - id: markdownlint
   - id: markdownlint-fix
+
+- repo: https://github.com/dotnet/format
+  rev: v5.1.225507
+  hooks:
+  - id: dotnet-format
