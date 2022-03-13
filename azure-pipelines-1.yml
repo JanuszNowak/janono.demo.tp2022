@@ -12,7 +12,7 @@ stages:
     - task: AzureResourceGroupDeployment@2
       displayName: Azure Deployment:Create Or Update Resource Group action on $(rg)
       inputs:
-        azureSubscription: MSDN-Apsis
+        azureSubscription: AzureServiceConnection
         resourceGroupName: $(rg)
         location: West Europe
         csmFile: $(System.DefaultWorkingDirectory)/_mimuw-Azure Functions for .NET-CI/drop arm/azuredeploy.json
@@ -23,7 +23,7 @@ stages:
     - task: AzurePowerShell@5
       displayName: 'Azure PowerShell script: InlineScript'
       inputs:
-        azureSubscription: MSDN-Apsis
+        azureSubscription: AzureServiceConnection
         ScriptType: InlineScript
         Inline: |
           Write-Host $(rg)
@@ -56,7 +56,7 @@ stages:
     - task: AzureFunctionApp@1
       displayName: 'Azure Function App Deploy: mimuw-$(env)-$(instName)site'
       inputs:
-        azureSubscription: MSDN-Apsis
+        azureSubscription: AzureServiceConnection
         appType: functionApp
         appName: mimuw-$(env)-$(instName)site
         package: $(System.DefaultWorkingDirectory)/_mimuw-Azure Functions for .NET-CI/drop/*.zip
@@ -68,6 +68,6 @@ stages:
     - task: AzureResourceGroupDeployment@2
       displayName: Azure Deployment:DeleteRG action on $(rg)
       inputs:
-        azureSubscription: MSDN-Apsis
+        azureSubscription: AzureServiceConnection
         action: DeleteRG
         resourceGroupName: $(rg)
