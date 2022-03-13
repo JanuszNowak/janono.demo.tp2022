@@ -53,7 +53,7 @@
       "type": "string",
       "defaultValue": "mimuw",
       "metadata": {
-        "description": "Name of Applcation."
+        "description": "Name of Application."
       }
     },
     "storageConfig": {
@@ -144,7 +144,6 @@
           "type": "Microsoft.Web/sites",
           "kind": "functionapp",
           "dependsOn": [
-            //"plancopy"
             "[resourceId('Microsoft.Web/serverfarms',concat(variables('name'),'-',parameters('instName')[copyIndex()],parameters('nameConv').hostingPlanName))]",
             "[concat(variables('name'),'-','global-',parameters('nameConv').appins)]"
           ],
@@ -159,11 +158,11 @@
                 {
                   "name": "AzureWebJobsStorage",
                   "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', concat(variables('namestorage'),parameters('instName')[copyIndex()],parameters('nameConv').storageAccountName), ';AccountKey=', listKeys(concat(variables('namestorage'),parameters('instName')[copyIndex()],parameters('nameConv').storageAccountName),'2015-05-01-preview').key1)]"
-                }, 
+                },
                 {
                   "name": "FUNCTIONS_EXTENSION_VERSION",
-                  "value": "~3"                
-                },           
+                  "value": "~3"
+                },
                 {
                   "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
                   "value": "[reference(resourceId('Microsoft.Insights/components', concat(variables('name'),'-','global-',parameters('nameConv').appins)), '2014-04-01').InstrumentationKey]"
@@ -191,32 +190,12 @@
         },
         "monitorConfig": {
           "protocol": "HTTPS",
-          "port": 443,          
+          "port": 443,
           "path": "/api/IsAlive"
         }
       },
       "name": "[concat(variables('name'),'-','global-',parameters('nameConv').trafficManagerName)]"
     },
-    //{
-    //  "apiVersion": "2015-11-01",
-    //  "type": "Microsoft.Network/trafficManagerProfiles/azureEndpoints",
-    //  "dependsOn": [
-    //    "[concat(variables('name'),'-','global-',parameters('nameConv').trafficManagerName)]" //,        
-    //  ],
-    //  "tags": {
-    //    "displayName": "trafficManagerEndpoint"
-    //  },
-    //  "location": "global",
-    //  "name": "[concat(concat(variables('name'),'-','global-',parameters('nameConv').trafficManagerName), '/endpoint-', toLower(concat(variables('name'),'-',parameters('instName')[copyIndex()],parameters('nameConv').siteName)))]",
-    //  "copy": {
-    //    "count": "[length(parameters('instName'))]",
-    //    "name": "plancopy"
-    //  },
-    //  "properties": {
-    //    "targetResourceId": "[resourceId('Microsoft.Web/sites/', concat(variables('name'),'-',parameters('instName')[copyIndex()],parameters('nameConv').siteName))]",
-    //    "endpointStatus": "Enabled"
-    //  }
-    //},
     {
       "apiVersion": "2014-04-01",
       "name": "[concat(variables('name'),'-','global-',parameters('nameConv').appins)]",
@@ -227,6 +206,5 @@
       }
     }
   ],
-  "outputs": {
-  }
+  "outputs": {}
 }

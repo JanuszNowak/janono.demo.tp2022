@@ -20,7 +20,7 @@ namespace MIMUW.FunctionApp
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");            
+            log.LogInformation("C# HTTP trigger function processed a request.");
             var result = new IsAliveContract
             {
                 isAlive = true,

@@ -94,9 +94,9 @@ New-AzResourceGroup -Name $ResourceGroupName -Location $ResourceGroupLocation -V
 
 if ($ValidateOnly) {
     $ErrorMessages = Format-ValidationOutput (Test-AzureRmResourceGroupDeployment -ResourceGroupName $ResourceGroupName `
-                                                                                  -TemplateFile $TemplateFile `
-                                                                                  -TemplateParameterFile $TemplateParametersFile `
-                                                                                  @OptionalParameters)
+                                                                                -TemplateFile $TemplateFile `
+                                                                                -TemplateParameterFile $TemplateParametersFile `
+                                                                                @OptionalParameters)
     if ($ErrorMessages) {
         Write-Output '', 'Validation returned the following errors:', @($ErrorMessages), '', 'Template is invalid.'
     }
@@ -106,12 +106,12 @@ if ($ValidateOnly) {
 }
 else {
     New-AzResourceGroupDeployment -Name ((Get-ChildItem $TemplateFile).BaseName + '-' + ((Get-Date).ToUniversalTime()).ToString('MMdd-HHmm')) `
-                                       -ResourceGroupName $ResourceGroupName `
-                                       -TemplateFile $TemplateFile `
-                                       -TemplateParameterFile $TemplateParametersFile `
-                                       @OptionalParameters `
-                                       -Force -Verbose `
-                                       -ErrorVariable ErrorMessages
+                                        -ResourceGroupName $ResourceGroupName `
+                                        -TemplateFile $TemplateFile `
+                                        -TemplateParameterFile $TemplateParametersFile `
+                                        @OptionalParameters `
+                                        -Force -Verbose `
+                                        -ErrorVariable ErrorMessages
     if ($ErrorMessages) {
         Write-Output '', 'Template deployment returned the following errors:', @(@($ErrorMessages) | ForEach-Object { $_.Exception.Message.TrimEnd("`r`n") })
     }

@@ -1,1 +1,0 @@
-# janono.demo.tp2022
