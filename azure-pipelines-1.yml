@@ -26,9 +26,9 @@ stages:
         azureSubscription: 'MSDN-Apsis'
         ScriptType: InlineScript
         Inline: |
-        Write-Host $(rg)
-        $resourceGroupName = "$(rg)"
-        $webSites=Get-AzWebApp -ResourceGroupName $resourceGroupName 
+            Write-Host $(rg)
+            $resourceGroupName = "$(rg)"
+            $webSites=Get-AzWebApp -ResourceGroupName $resourceGroupName 
             $TmProfile = get-AzTrafficManagerProfile -ResourceGroupName $resourceGroupName 
             foreach($web in $webSites)
             {
