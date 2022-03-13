@@ -1,0 +1,232 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "storageAccountType": {
+      "type": "string",
+      "defaultValue": "Standard_LRS",
+      "allowedValues": [
+        "Standard_LRS",
+        "Standard_GRS",
+        "Standard_ZRS",
+        "Premium_LRS"
+      ],
+      "metadata": {
+        "description": "Storage Account type"
+      }
+    },
+    "slotName": {
+      "type": "string",
+      "defaultValue": "staging",
+      "metadata": {
+        "description": "The name of the deplotment slot"
+      }
+    },
+    "instLocation": {
+      "type": "array",
+      "defaultValue": [
+        "westeurope",
+        "eastus2"
+      ]
+    },
+    "instName": {
+      "type": "array",
+      "defaultValue": [
+        "euw",
+        "use2"
+      ]
+    },
+    "environmentType": {
+      "type": "string",
+      "allowedValues": [
+        "dev",
+        "prod",
+        "jnno",
+        "test"
+      ],
+      "defaultValue": "dev",
+      "metadata": {
+        "description": "Type of environment where this deployment should occur."
+      }
+    },
+    "applicationName": {
+      "type": "string",
+      "defaultValue": "mimuw",
+      "metadata": {
+        "description": "Name of Applcation."
+      }
+    },
+    "storageConfig": {
+      "type": "object",
+      "defaultValue": {
+        "kind": "StorageV2",
+        "accessTier": "Hot",
+        "httpsTrafficOnlyEnabled": true
+      }
+    },
+    "nameConv": {
+      "type": "object",
+      "defaultValue": {
+        "storageAccountName": "stacc",
+        "hostingPlanName": "plan",
+        "siteName": "site",
+        "trafficManagerName": "tmanager",
+        "appins": "appins"
+      }
+    }
+  },
+  "variables": {
+    "appInsNameMonitor": "mimuw",
+    "nameAppMonitor": "mimuw",
+    "storageAccountNameMonitor": "mimuw",
+    "hostingPlanNameMonitor": "mimuw",
+    "storageAccountidMonitor": "mimuw",
+    "namestorage": "[concat(parameters('applicationName'),parameters('environmentType'))]",
+    "name": "[concat(parameters('applicationName'),'-',parameters('environmentType'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2017-10-01",
+      "sku": {
+        "name": "[parameters('storageAccountType')]"
+      },
+      "kind": "[parameters('storageConfig').kind]",
+      "properties": {
+        "supportsHttpsTrafficOnly": "[parameters('storageConfig').httpsTrafficOnlyEnabled]",
+        "accessTier": "[parameters('storageConfig').accessTier]",
+        "encryption": {
+          "services": {
+            "blob": {
+              "enabled": true
+            },
+            "file": {
+              "enabled": true
+            }
+          },
+          "keySource": "Microsoft.Storage"
+        }
+      },
+      "tags": {
+        "displayName": "Array Storage Accounts"
+      },
+      "location": "[parameters('instLocation')[copyIndex()]]",
+      "name": "[concat(variables('namestorage'),parameters('instName')[copyIndex()],parameters('nameConv').storageAccountName)]",
+      "copy": {
+        "count": "[length(parameters('instLocation'))]",
+        "name": "storagecopy"
+      }
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2015-04-01",
+      "properties": {
+        "computeMode": "Dynamic",
+        "sku": "Dynamic"
+      },
+      "tags": {
+        "displayName": "Array Hosting Plans"
+      },
+      "location": "[parameters('instLocation')[copyIndex()]]",
+      "name": "[concat(variables('name'),'-',parameters('instName')[copyIndex()],parameters('nameConv').hostingPlanName)]",
+      "copy": {
+        "count": "[length(parameters('instLocation'))]",
+        "name": "plancopy"
+      },
+      "resources": [
+        {
+          "name": "[concat(variables('name'),'-',parameters('instName')[copyIndex()],parameters('nameConv').siteName)]",
+          "location": "[parameters('instLocation')[copyIndex()]]",
+          "tags": {
+            "displayName": "Array Sites"
+          },
+          "apiVersion": "2016-08-01",
+          "type": "Microsoft.Web/sites",
+          "kind": "functionapp",
+          "dependsOn": [
+            //"plancopy"
+            "[resourceId('Microsoft.Web/serverfarms',concat(variables('name'),'-',parameters('instName')[copyIndex()],parameters('nameConv').hostingPlanName))]",
+            "[concat(variables('name'),'-','global-',parameters('nameConv').appins)]"
+          ],
+          "properties": {
+            "serverFarmId": "[resourceId('Microsoft.Web/serverfarms',concat(variables('name'),'-',parameters('instName')[copyIndex()],parameters('nameConv').hostingPlanName))]",
+            "siteConfig": {
+              "appSettings": [
+                {
+                  "name": "AzureWebJobsDashboard",
+                  "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', concat(variables('namestorage'),parameters('instName')[copyIndex()],parameters('nameConv').storageAccountName), ';AccountKey=', listKeys(concat(variables('namestorage'),parameters('instName')[copyIndex()],parameters('nameConv').storageAccountName),'2015-05-01-preview').key1)]"
+                },
+                {
+                  "name": "AzureWebJobsStorage",
+                  "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', concat(variables('namestorage'),parameters('instName')[copyIndex()],parameters('nameConv').storageAccountName), ';AccountKey=', listKeys(concat(variables('namestorage'),parameters('instName')[copyIndex()],parameters('nameConv').storageAccountName),'2015-05-01-preview').key1)]"
+                }, 
+                {
+                  "name": "FUNCTIONS_EXTENSION_VERSION",
+                  "value": "~3"                
+                },           
+                {
+                  "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                  "value": "[reference(resourceId('Microsoft.Insights/components', concat(variables('name'),'-','global-',parameters('nameConv').appins)), '2014-04-01').InstrumentationKey]"
+                },
+                {
+                  "name": "StorageConnectionString",
+                  "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', concat(variables('namestorage'),parameters('instName')[copyIndex()],parameters('nameConv').storageAccountName), ';AccountKey=', listKeys(concat(variables('namestorage'),parameters('instName')[copyIndex()],parameters('nameConv').storageAccountName),'2015-05-01-preview').key1)]"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "apiVersion": "2015-11-01",
+      "type": "Microsoft.Network/trafficManagerProfiles",
+      "location": "global",
+      "properties": {
+        "profileStatus": "Enabled",
+        "trafficRoutingMethod": "Performance",
+        "dnsConfig": {
+          "relativeName": "[concat(variables('name'),'-','global-',parameters('nameConv').trafficManagerName)]",
+          "ttl": 30
+        },
+        "monitorConfig": {
+          "protocol": "HTTPS",
+          "port": 443,          
+          "path": "/api/IsAlive"
+        }
+      },
+      "name": "[concat(variables('name'),'-','global-',parameters('nameConv').trafficManagerName)]"
+    },
+    //{
+    //  "apiVersion": "2015-11-01",
+    //  "type": "Microsoft.Network/trafficManagerProfiles/azureEndpoints",
+    //  "dependsOn": [
+    //    "[concat(variables('name'),'-','global-',parameters('nameConv').trafficManagerName)]" //,        
+    //  ],
+    //  "tags": {
+    //    "displayName": "trafficManagerEndpoint"
+    //  },
+    //  "location": "global",
+    //  "name": "[concat(concat(variables('name'),'-','global-',parameters('nameConv').trafficManagerName), '/endpoint-', toLower(concat(variables('name'),'-',parameters('instName')[copyIndex()],parameters('nameConv').siteName)))]",
+    //  "copy": {
+    //    "count": "[length(parameters('instName'))]",
+    //    "name": "plancopy"
+    //  },
+    //  "properties": {
+    //    "targetResourceId": "[resourceId('Microsoft.Web/sites/', concat(variables('name'),'-',parameters('instName')[copyIndex()],parameters('nameConv').siteName))]",
+    //    "endpointStatus": "Enabled"
+    //  }
+    //},
+    {
+      "apiVersion": "2014-04-01",
+      "name": "[concat(variables('name'),'-','global-',parameters('nameConv').appins)]",
+      "type": "Microsoft.Insights/components",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "ApplicationId": "[concat(variables('name'),'-','global-',parameters('nameConv').appins)]"
+      }
+    }
+  ],
+  "outputs": {
+  }
+}
