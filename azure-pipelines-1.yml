@@ -18,8 +18,6 @@ stages:
         csmFile: $(System.DefaultWorkingDirectory)/_mimuw-Azure Functions for .NET-CI/drop arm/azuredeploy.json
         csmParametersFile: $(System.DefaultWorkingDirectory)/_mimuw-Azure Functions for .NET-CI/drop arm/azuredeploy.parameters.json
         overrideParameters: -instLocation [$(instLocationB)] -instName [$(instNameB)] -environmentType $(env)
-
-
     - task: AzurePowerShell@5
       displayName: 'Azure PowerShell script: InlineScript'
       inputs:
@@ -48,6 +46,7 @@ stages:
           }
           Set-AzTrafficManagerProfile -TrafficManagerProfile $TmProfile
         azurePowerShellVersion: LatestVersion
+        pwsh: true
 
 - stage: AppDeploy
   jobs:
