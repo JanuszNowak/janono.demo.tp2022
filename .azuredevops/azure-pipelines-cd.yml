@@ -39,8 +39,8 @@ stages:
         azureSubscription: AzureServiceConnection
         resourceGroupName: $(rg)
         location: West Europe
-        csmFile: $(System.DefaultWorkingDirectory)/_mimuw-Azure Functions for .NET-CI/drop arm/azuredeploy.json
-        csmParametersFile: $(System.DefaultWorkingDirectory)/_mimuw-Azure Functions for .NET-CI/drop arm/azuredeploy.parameters.json
+        csmFile: $(Pipeline.Workspace)/${{ parameters.build_ci }}/drop arm/azuredeploy.json
+        csmParametersFile: $(Pipeline.Workspace)/${{ parameters.build_ci }}/drop arm/azuredeploy.parameters.json
         overrideParameters: -instLocation [$(instLocationB)] -instName [$(instNameB)] -environmentType $(env)
     - task: AzurePowerShell@5
       displayName: 'Azure PowerShell script: InlineScript'
@@ -82,7 +82,7 @@ stages:
         azureSubscription: AzureServiceConnection
         appType: functionApp
         appName: mimuw-$(env)-$(instName)site
-        package: $(System.DefaultWorkingDirectory)/_mimuw-Azure Functions for .NET-CI/drop/*.zip
+        package: $(Pipeline.Workspace)/${{ parameters.build_ci }}/drop/*.zip
 
 - stage: Deprovision
   jobs:
