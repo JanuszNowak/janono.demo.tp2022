@@ -1,11 +1,14 @@
 variables:
   system.debug: true
   env: dev
-  applicationName: tp2022
+  #applicationName: tp2022
   rg: $(applicationName)-$(env)-global-rg
 
 
 parameters:
+- name: applicationName
+  type: string
+  default: tp2022
 - name: build_ci
   type: string
   default: janono.demo.tp2022-ci
