@@ -86,6 +86,7 @@ stages:
         use2:
           location: "use2"
     steps:
+    - download: ${{ parameters.build_ci }}
     - task: AzureFunctionApp@1
       displayName: 'Azure Function App Deploy: $(applicationName)-$(env)-$(location)site'
       inputs:
