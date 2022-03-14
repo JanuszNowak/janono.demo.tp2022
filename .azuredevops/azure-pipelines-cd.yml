@@ -11,9 +11,6 @@ parameters:
   type: string
   default: janono.demo.tp2022-ci
 
-- name: build_ci
-  type: string
-
 trigger:
 - none
 
