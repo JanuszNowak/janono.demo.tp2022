@@ -9,11 +9,6 @@ parameters:
 - name: build_ci
   type: string
   default: janono.demo.tp2022-ci
-- name: instName
-  type: object
-  default:
-  - euw
-  - use2
 - name: destroy
   type: boolean
   default: false
