@@ -1,7 +1,8 @@
 variables:
   system.debug: true
   env: dev
-  rg: tp2022-$(env)-global-rg
+  applicationName: tp2022
+  rg: $(applicationName)-$(env)-global-rg
   instLocationB: "westeurope,eastus2,northeurope"
   instName: "euw,use2,eun"
   instNameB: "euw, use2, eun"
@@ -41,7 +42,7 @@ stages:
         location: West Europe
         csmFile: $(Pipeline.Workspace)/${{ parameters.build_ci }}/drop arm/azuredeploy.json
         csmParametersFile: $(Pipeline.Workspace)/${{ parameters.build_ci }}/drop arm/azuredeploy.parameters.json
-        overrideParameters: -environmentType $(env)
+        overrideParameters: -applicationName $(applicationName) -environmentType $(env)
     - task: AzurePowerShell@5
       displayName: 'Azure PowerShell script: InlineScript'
       inputs:
@@ -77,11 +78,11 @@ stages:
   - job: AppDeploy_job
     steps:
     - task: AzureFunctionApp@1
-      displayName: 'Azure Function App Deploy: mimuw-$(env)-$(instName)site'
+      displayName: 'Azure Function App Deploy: $(applicationName)-$(env)-$(instName)site'
       inputs:
         azureSubscription: AzureServiceConnection
         appType: functionApp
-        appName: mimuw-$(env)-$(instName)site
+        appName: $(applicationName)-$(env)-$(instName)site
         package: $(Pipeline.Workspace)/${{ parameters.build_ci }}/drop/*.zip
 
 - stage: Deprovision
