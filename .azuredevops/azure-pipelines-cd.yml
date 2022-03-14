@@ -98,7 +98,7 @@ stages:
         appName: $(applicationName)-$(env)-$(location)site
         package: $(Pipeline.Workspace)/${{ parameters.build_ci }}/drop/*.zip
 
- ${{ if eq(parameters.test, true) }}:
+ ${{ if eq(parameters.destroy, true) }}:
 - stage: Deprovision
   jobs:
   - job: Deprovision_job
