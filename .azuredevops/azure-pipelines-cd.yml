@@ -2,9 +2,9 @@ variables:
   system.debug: true
   env: dev
   rg: tp2022-$(env)-global-rg
-  instLocationB: westeurope, eastus2, northeurope
-  instName: euw,use2,eun
-  instNameB: euw, use2, eun
+  instLocationB: [westeurope, eastus2, northeurope]
+  instName: [euw,use2,eun]
+  instNameB: [euw, use2, eun]
 
 parameters:
 - name: build_ci
