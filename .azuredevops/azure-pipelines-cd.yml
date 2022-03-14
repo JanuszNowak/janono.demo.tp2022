@@ -1,0 +1,83 @@
+variables:
+  system.debug: true
+trigger:
+- none
+resources:
+  pipelines:
+  - pipeline: janono.demo.tp2022-ci
+    source: janono.demo.tp2022-ci
+    trigger:
+      branches:
+      - release/*
+      - master
+      - develop
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+- stage: provisioning
+  jobs:
+  - job: provisioning_job
+    steps:
+    - task: AzureResourceGroupDeployment@2
+      displayName: Azure Deployment:Create Or Update Resource Group action on $(rg)
+      inputs:
+        azureSubscription: AzureServiceConnection
+        resourceGroupName: $(rg)
+        location: West Europe
+        csmFile: $(System.DefaultWorkingDirectory)/_mimuw-Azure Functions for .NET-CI/drop arm/azuredeploy.json
+        csmParametersFile: $(System.DefaultWorkingDirectory)/_mimuw-Azure Functions for .NET-CI/drop arm/azuredeploy.parameters.json
+        overrideParameters: -instLocation [$(instLocationB)] -instName [$(instNameB)] -environmentType $(env)
+    - task: AzurePowerShell@5
+      displayName: 'Azure PowerShell script: InlineScript'
+      inputs:
+        azureSubscription: AzureServiceConnection
+        ScriptType: InlineScript
+        Inline: |
+          Write-Host $(rg)
+          $resourceGroupName = "$(rg)"
+          $webSites=Get-AzWebApp -ResourceGroupName $resourceGroupName
+          $TmProfile = get-AzTrafficManagerProfile -ResourceGroupName $resourceGroupName
+          foreach($web in $webSites)
+          {
+              if($TmProfile.Endpoints.Count -eq 0)
+              {
+                  Write-Output "Adding 1 endpoint"
+                  Add-AzTrafficManagerEndpointConfig -EndpointName $web.Name -TrafficManagerProfile $TmProfile -Type AzureEndpoints -Target $web.HostNames[0] -EndpointLocation $web.Location -EndpointStatus Enabled -TargetResourceId $web.Id
+              }
+              else
+              {
+                  if(($TmProfile.Endpoints -ne $null) -and ($TmProfile.Endpoints.Name.Contains($web.Name) -eq $false))
+                  {
+                      Write-Output "Adding next endpoint"
+                      Add-AzTrafficManagerEndpointConfig -EndpointName $web.Name -TrafficManagerProfile $TmProfile -Type AzureEndpoints -Target $web.HostNames[0] -EndpointLocation $web.Location -EndpointStatus Enabled -TargetResourceId $web.Id
+                  }
+              }
+          }
+          Set-AzTrafficManagerProfile -TrafficManagerProfile $TmProfile
+        azurePowerShellVersion: LatestVersion
+        pwsh: true
+
+- stage: AppDeploy
+  jobs:
+  - job: AppDeploy_job
+    steps:
+    - task: AzureFunctionApp@1
+      displayName: 'Azure Function App Deploy: mimuw-$(env)-$(instName)site'
+      inputs:
+        azureSubscription: AzureServiceConnection
+        appType: functionApp
+        appName: mimuw-$(env)-$(instName)site
+        package: $(System.DefaultWorkingDirectory)/_mimuw-Azure Functions for .NET-CI/drop/*.zip
+
+- stage: Deprovision
+  jobs:
+  - job: Deprovision_job
+    steps:
+    - task: AzureResourceGroupDeployment@2
+      displayName: Azure Deployment:DeleteRG action on $(rg)
+      inputs:
+        azureSubscription: AzureServiceConnection
+        action: DeleteRG
+        resourceGroupName: $(rg)
