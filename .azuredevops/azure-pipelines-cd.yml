@@ -3,11 +3,23 @@ variables:
   env: dev
   applicationName: tp2022
   rg: $(applicationName)-$(env)-global-rg
-  instLocationB: "westeurope,eastus2,northeurope"
-  instName: "euw,use2,eun"
+  instLocationB: "westeurope,eastus2,northeurope"  
   instNameB: "euw, use2, eun"
 
-
+  instName: >
+    {
+      euw:
+      {
+        location: 'euw'
+      },
+      use2:
+      {
+        location: 'use2'
+      },
+      {
+        location: 'eun'
+      }
+    }
 
 parameters:
 - name: build_ci
@@ -85,14 +97,14 @@ stages:
   jobs:
   - job: AppDeploy_job
     strategy:
-      matrix: $[parameters.instName]
+      matrix: $[ variables.instName ]
     steps:
     - task: AzureFunctionApp@1
-      displayName: 'Azure Function App Deploy: $(applicationName)-$(env)-$(instName)site'
+      displayName: 'Azure Function App Deploy: $(applicationName)-$(env)-$(location)site'
       inputs:
         azureSubscription: AzureServiceConnection
         appType: functionApp
-        appName: $(applicationName)-$(env)-$(instName)site
+        appName: $(applicationName)-$(env)-$(location)site
         package: $(Pipeline.Workspace)/${{ parameters.build_ci }}/drop/*.zip
 
 - stage: Deprovision
