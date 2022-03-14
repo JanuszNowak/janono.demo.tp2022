@@ -14,6 +14,9 @@ parameters:
   default:
   - euw
   - use2
+- name: destroy
+  boolean
+  default: false
 
 trigger:
 - none
@@ -95,6 +98,7 @@ stages:
         appName: $(applicationName)-$(env)-$(location)site
         package: $(Pipeline.Workspace)/${{ parameters.build_ci }}/drop/*.zip
 
+ ${{ if eq(parameters.test, true) }}:
 - stage: Deprovision
   jobs:
   - job: Deprovision_job
