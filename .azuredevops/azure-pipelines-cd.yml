@@ -2,7 +2,7 @@ variables:
   system.debug: true
   env: dev
   #applicationName: tp2022
-  rg: $(applicationName)-$(env)-global-rg
+  rg: ${{ parameters.applicationName }}-$(env)-global-rg
 
 
 parameters:
@@ -46,7 +46,7 @@ stages:
         location: West Europe
         csmFile: $(Pipeline.Workspace)/${{ parameters.build_ci }}/drop arm/azuredeploy.json
         csmParametersFile: $(Pipeline.Workspace)/${{ parameters.build_ci }}/drop arm/azuredeploy.parameters.json
-        overrideParameters: -applicationName $(applicationName) -environmentType $(env)
+        overrideParameters: -applicationName ${{ parameters.applicationName }} -environmentType $(env)
     - task: AzurePowerShell@5
       displayName: 'Azure PowerShell script: InlineScript'
       inputs:
@@ -89,11 +89,11 @@ stages:
     steps:
     - download: ${{ parameters.build_ci }}
     - task: AzureFunctionApp@1
-      displayName: 'Azure Function App Deploy: $(applicationName)-$(env)-$(location)site'
+      displayName: 'Azure Function App Deploy: ${{ parameters.applicationName }}-$(env)-$(location)site'
       inputs:
         azureSubscription: AzureServiceConnection
         appType: functionApp
-        appName: $(applicationName)-$(env)-$(location)site
+        appName: ${{ parameters.applicationName }}-$(env)-$(location)site
         package: $(Pipeline.Workspace)/${{ parameters.build_ci }}/drop/*.zip
 
 - ${{ if eq(parameters.destroy, true) }}:
