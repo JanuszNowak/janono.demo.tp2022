@@ -99,13 +99,13 @@ stages:
         package: $(Pipeline.Workspace)/${{ parameters.build_ci }}/drop/*.zip
 
  ${{ if eq(parameters.destroy, true) }}:
-- stage: Deprovision
-  jobs:
-  - job: Deprovision_job
-    steps:
-    - task: AzureResourceGroupDeployment@2
-      displayName: Azure Deployment:DeleteRG action on $(rg)
-      inputs:
-        azureSubscription: AzureServiceConnection
-        action: DeleteRG
-        resourceGroupName: $(rg)
+  - stage: Deprovision
+    jobs:
+    - job: Deprovision_job
+      steps:
+      - task: AzureResourceGroupDeployment@2
+        displayName: Azure Deployment:DeleteRG action on $(rg)
+        inputs:
+          azureSubscription: AzureServiceConnection
+          action: DeleteRG
+          resourceGroupName: $(rg)
