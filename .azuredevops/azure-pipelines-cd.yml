@@ -85,7 +85,7 @@ stages:
   jobs:
   - job: AppDeploy_job
     strategy:
-      matrix:  ${{ parameters.instName }}
+      matrix: $[parameters.instName]
     steps:
     - task: AzureFunctionApp@1
       displayName: 'Azure Function App Deploy: $(applicationName)-$(env)-$(instName)site'
