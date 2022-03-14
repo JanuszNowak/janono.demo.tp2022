@@ -7,10 +7,18 @@ variables:
   instName: "euw,use2,eun"
   instNameB: "euw, use2, eun"
 
+
+
 parameters:
 - name: build_ci
   type: string
   default: janono.demo.tp2022-ci
+- name: instName
+  type: object
+  default:
+  - euw
+  - use2
+  - eun
 
 trigger:
 - none
@@ -76,6 +84,8 @@ stages:
 - stage: AppDeploy
   jobs:
   - job: AppDeploy_job
+    strategy:
+      matrix:  ${{ parameters.instName }}
     steps:
     - task: AzureFunctionApp@1
       displayName: 'Azure Function App Deploy: $(applicationName)-$(env)-$(instName)site'
