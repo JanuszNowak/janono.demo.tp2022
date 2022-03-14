@@ -2,10 +2,7 @@ variables:
   system.debug: true
   env: dev
   rg: tp2022-$(env)-global-rg
-  instLocationB:
-    - westeurope
-    - eastus2
-    - northeurope
+  instLocationB: "westeurope,eastus2,northeurope"
   instName: "euw,use2,eun"
   instNameB: "euw, use2, eun"
 
@@ -44,7 +41,7 @@ stages:
         location: West Europe
         csmFile: $(Pipeline.Workspace)/${{ parameters.build_ci }}/drop arm/azuredeploy.json
         csmParametersFile: $(Pipeline.Workspace)/${{ parameters.build_ci }}/drop arm/azuredeploy.parameters.json
-        overrideParameters: -instLocation [$(instLocationB)] -instName [$(instNameB)] -environmentType $(env)
+        overrideParameters: -environmentType $(env)
     - task: AzurePowerShell@5
       displayName: 'Azure PowerShell script: InlineScript'
       inputs:
