@@ -1,5 +1,16 @@
+variables:
+  system.debug: true
 trigger:
-- master
+- none
+resources:
+  pipelines:
+  - pipeline: janono.demo.tp2022-ci
+    source: janono.demo.tp2022-ci
+    trigger:
+      branches:
+      - release/*
+      - master
+      - develop
 
 pool:
   vmImage: ubuntu-latest

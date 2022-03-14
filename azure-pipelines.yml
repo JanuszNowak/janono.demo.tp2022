@@ -2,6 +2,7 @@ pool:
   name: Azure Pipelines
 variables:
   buildConfiguration: Release
+  system.debug: true
 
 steps:
 - task: DotNetCoreCLI@2
