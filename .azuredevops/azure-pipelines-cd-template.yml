@@ -7,15 +7,15 @@ parameters:
   - prod
 
 - name: build_ci
-  type: string  
+  type: string
 
-stages:  
-  - stage: Stage_${{ parameters.stage_name }}
-    jobs:      
-    - deployment: Deployment_to_stage_${{ parameters.stage_name }}
-      environment: ${{ parameters.dev }}
-      strategy:
-        runOnce:
-          deploy:
-            steps:
-            - download: ${{ parameters.build_ci }}
+stages:
+- stage: Stage_${{ parameters.stage_name }}
+  jobs:
+  - deployment: Deployment_to_stage_${{ parameters.stage_name }}
+    environment: ${{ parameters.dev }}
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: ${{ parameters.build_ci }}
