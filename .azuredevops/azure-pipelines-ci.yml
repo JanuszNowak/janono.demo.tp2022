@@ -13,7 +13,7 @@ pr:
     - develop
   paths:
     exclude:
-    - .azuredevops
+    - .azuredevops/*
 
 steps:
 - task: DotNetCoreCLI@2
