@@ -4,6 +4,15 @@ variables:
   buildConfiguration: Release
   system.debug: true
 
+trigger:
+  branches:
+    include:
+    - master
+    - release/*
+    - develop
+  paths:
+    exclude:
+    - .azuredevops/*
 
 pr:
   branches:
