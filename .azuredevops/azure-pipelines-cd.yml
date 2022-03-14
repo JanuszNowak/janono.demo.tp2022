@@ -1,5 +1,11 @@
 variables:
   system.debug: true
+  env: dev
+  rg: tp2022-$(env)-global-rg
+  instLocationB: ["westeurope","eastus2","northeurope"]
+  instName: [euw,use2,eun]
+  instNameB: ["euw","use2","eun"]
+
 trigger:
 - none
 resources:
@@ -11,6 +17,7 @@ resources:
       - release/*
       - master
       - develop
+
 
 pool:
   vmImage: ubuntu-latest
