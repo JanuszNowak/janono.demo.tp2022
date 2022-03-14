@@ -3,23 +3,7 @@ variables:
   env: dev
   applicationName: tp2022
   rg: $(applicationName)-$(env)-global-rg
-  instLocationB: "westeurope,eastus2,northeurope"  
-  instNameB: "euw, use2, eun"
 
-  instName: >
-    {
-      euw:
-      {
-        location: 'euw'
-      },
-      use2:
-      {
-        location: 'use2'
-      },
-      {
-        location: 'eun'
-      }
-    }
 
 parameters:
 - name: build_ci
@@ -30,7 +14,6 @@ parameters:
   default:
   - euw
   - use2
-  - eun
 
 trigger:
 - none
@@ -97,7 +80,11 @@ stages:
   jobs:
   - job: AppDeploy_job
     strategy:
-      matrix: $[ variables.instName ]
+      matrix:
+        euw:
+          location: "euw"
+        use2:
+          location: "use2"
     steps:
     - task: AzureFunctionApp@1
       displayName: 'Azure Function App Deploy: $(applicationName)-$(env)-$(location)site'
