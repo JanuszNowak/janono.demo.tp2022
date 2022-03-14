@@ -2,7 +2,7 @@ variables:
   system.debug: true
   env: dev
   rg: tp2022-$(env)-global-rg
-  instLocationB: 
+  instLocationB:
     - westeurope
     - eastus2
     - northeurope
