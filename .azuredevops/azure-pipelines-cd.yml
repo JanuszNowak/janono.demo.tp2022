@@ -6,8 +6,17 @@ variables:
   instName: euw,use2,eun
   instNameB: euw, use2, eun
 
+parameters:
+- name: build_ci
+  type: string
+  default: janono.demo.tp2022-ci
+
+- name: build_ci
+  type: string
+
 trigger:
 - none
+
 resources:
   pipelines:
   - pipeline: janono.demo.tp2022-ci
@@ -18,7 +27,6 @@ resources:
       - master
       - develop
 
-
 pool:
   vmImage: ubuntu-latest
 
@@ -27,6 +35,7 @@ stages:
   jobs:
   - job: provisioning_job
     steps:
+    - download: ${{ parameters.build_ci }}
     - task: AzureResourceGroupDeployment@2
       displayName: Azure Deployment:Create Or Update Resource Group action on $(rg)
       inputs:
