@@ -39,6 +39,7 @@
     "environmentType": {
       "type": "string",
       "allowedValues": [
+        "pr",
         "dev",
         "prod",
         "jnno",
